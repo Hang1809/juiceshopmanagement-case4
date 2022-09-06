@@ -46,7 +46,8 @@ public class Product extends BaseEntity{
                 .setQuantity(quantity)
                 .setLocked(isLocked)
                 .setCategory(category)
-                .setCreatedBy(getCreatedBy().toUserDTO());
+                .setCreatedBy(getCreatedBy().toUserDTO())
+                ;
     }
 
     public Product updateProduct(ProductDTO updates) {

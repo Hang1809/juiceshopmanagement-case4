@@ -22,7 +22,7 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String name;
     @Column(unique = true, nullable = false)
     private String username;
@@ -37,7 +37,7 @@ public class User extends BaseEntity {
     private String address;
 
     @Column
-    @Pattern(regexp = "^[0][1-9][0-9]{8,9}$", message = "Wrong phone format. Please follow this pattern: 0981234567")
+//    @Pattern(regexp = "^[0][1-9][0-9]{8,9}$", message = "Wrong phone format. Please follow this pattern: 0981234567")
     private String phone;
 
     @Column

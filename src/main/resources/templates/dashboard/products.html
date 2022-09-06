@@ -53,6 +53,7 @@
                                 <th>Product Name</th>
                                 <th>Price</th>
                                 <th>Quantity</th>
+                                <th>Create by</th>
                                 <th>Category</th>
                                 <th>Status</th>
                                 <th class="text-center" id="action">Action</th>
@@ -144,13 +145,17 @@
     function renderProducts() {
         $.ajax({
             "type": "GET",
-            "url": page.urls.findAllProducts
+            "url": 'http://localhost:8082/api/dashboard/products'
         })
             .done((data) => {
-                data.forEach(item => {
+
+                console.log(data);
+                $.each(data, (i, item) => {
+                    console.log(item);
                     product = item;
-                    prependRow();
+                    prependRow(product);
                 })
+
 
                 handleBtn();
             })
@@ -242,19 +247,26 @@
 
         category.id = page.dialogs.element.categoryCreate.val();
         product.category = category;
+        let createBy = new User(1);
+        let isLocked = "false";
+        product.createdBy = createBy;
+        product.isLocked = isLocked;
 
+        console.log(product);
         $.ajax({
             "headers": {
                 "accept": "application/json",
                 "content-type": "application/json"
             },
             "type": "POST",
-            "url": page.urls.createProduct,
+            "url": "http://localhost:8082/api/dashboard/product/create",
             "data": JSON.stringify(product)
         })
             .done((data) => {
+                // alert("okey thanh cong")
                 product = data;
-                prependRow();
+
+                prependRow(product);
 
                 page.dialogs.element.frmCreateProduct[0].reset();
                 page.dialogs.element.mdCreateProduct.modal("hide");
@@ -262,6 +274,7 @@
                 App.SweetAlert.showSuccessAlert(App.SUCCESS_CREATED);
             })
             .fail(function (jqXHR) {
+                console.log(jqXHR);
                 handleFailedTasks(jqXHR, "Create");
             })
     }
@@ -508,7 +521,7 @@
             })
     }
 
-    function prependRow() {
+    function prependRow(product) {
         let str = `
             <tr id="tr_${product.id}">
                 <td class="text-center">${product.id}</td>
@@ -589,19 +602,6 @@
             App.SweetAlert.showErrorAlert(App.ERROR_500);
         }
 
-        // if (!jqXHR.responseJSON) {
-        //     App.IziToast.showErrorAlert(jqXHR.responseText);
-        // } else {
-        //     let str = ``;
-        //     $.each(jqXHR.responseJSON, (key, value) => {
-        //         str += `<label id=${key}Create-error class="error" for="${key}Create">${value}</label>`;
-        //         $("#" + key + "Create").addClass("error");
-        //     })
-        //
-        //     page.dialogs.alertDanger.mdCreateProduct
-        //         .addClass('show')
-        //         .append(str);
-        // }
     }
 
     //initialization

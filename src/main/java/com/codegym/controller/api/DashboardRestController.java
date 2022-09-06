@@ -54,13 +54,14 @@ public class DashboardRestController {
 
     @GetMapping("/products")
     public ResponseEntity<?> showProductList() {
-        Long currentUserId = securityAuditorAware.getCurrentAuditor().get().getId();
-        List<ProductDTO> productList = new ArrayList<>();
-        if (roleService.checkIfADMIN(currentUserId)) {
-            productList = productService.findAllDTO();
-        } else {
-            productList = productService.findAllOwnedProductsDTO(currentUserId);
-        }
+       List<ProductDTO> productList = productService.findAllDTO();
+//        Long currentUserId = securityAuditorAware.getCurrentAuditor().get().getId();
+//        List<ProductDTO> productList = new ArrayList<>();
+//        if (roleService.checkIfADMIN(currentUserId)) {
+//
+//        } else {
+//            productList = productService.findAllOwnedProductsDTO(currentUserId);
+//        }
 
         if (productList.isEmpty())
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -101,26 +102,27 @@ public class DashboardRestController {
     @PostMapping("/product/create")
     public ResponseEntity<?> createProduct(@Validated @RequestBody ProductDTO productDTO,
                                            BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            return appUtils.mapErrorToResponse(bindingResult);
+
         Category category = productDTO.getCategory();
+
+        Optional<User> userOptional = userService.findOptById(productDTO.getCreatedBy().getId());
+
+        productDTO.setCreatedBy(userOptional.get().toUserDTO());
 
         if (!categoryService.ifExists(category.getId()))
             bindingResult.addError(new FieldError("category", "category", "Category invalid"));
 
         category = categoryService.findById(category.getId());
 
-        if (bindingResult.hasErrors())
-            return appUtils.mapErrorToResponse(bindingResult);
-
         try {
-            Product newProduct = productService.create(productDTO);
-            productDTO = newProduct.toProductDTO();
             productDTO.setCategory(category);
-            return new ResponseEntity<>(productDTO, HttpStatus.CREATED);
+            Product newProduct = productService.create(productDTO);
+            return new ResponseEntity<>(newProduct.toProductDTO(), HttpStatus.CREATED);
 
         } catch (DataIntegrityViolationException e) {
             throw new DataInputException("Account information is not valid, please check the information again");
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -240,6 +242,7 @@ public class DashboardRestController {
         if (!optRole.isPresent())
             bindingResult.addError(new FieldError("role", "role", "Invalid role"));
 
+        userDTO.setRole(optRole.get().toRoleDTO());
         if (userService.ifEmailExists(userDTO.getEmail()))
             bindingResult.addError(new FieldError("email", "email", "This email has already been registered"));
 
@@ -251,9 +254,7 @@ public class DashboardRestController {
 
         try {
             User newUser = userService.create(userDTO);
-            newUser.setRole(optRole.get());
-            userDTO = newUser.toUserDTO();
-            return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
+            return new ResponseEntity<>(newUser.toUserDTO(), HttpStatus.CREATED);
 
         } catch (DataIntegrityViolationException e) {
             throw new DataInputException("Account information is not valid, please check the information again");
@@ -288,6 +289,8 @@ public class DashboardRestController {
             bindingResult.addError(new FieldError("email", "email", "This email has already been registered"));
         if (userService.ifPhoneExistsExceptSelf(userDTO.getPhone(), id))
             bindingResult.addError(new FieldError("phone", "phone", "This number has already been registered"));
+        if (userService.existsByUsernameAndIdIsNot(userDTO.getUsername(), id))
+            bindingResult.addError(new FieldError("username", "username", "This username has already been registered"));
 
         if (bindingResult.hasErrors())
             return appUtils.mapErrorToResponse(bindingResult);

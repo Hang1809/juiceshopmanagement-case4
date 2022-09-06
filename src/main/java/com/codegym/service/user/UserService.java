@@ -80,6 +80,11 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public boolean existsByUsernameAndIdIsNot(String username, Long id) {
+        return userRepository.existsByUsernameAndIdIsNot(username, id);
+    }
+
+    @Override
     public boolean ifPhoneExists(String phone) {
         return userRepository.existsByPhone(phone);
     }

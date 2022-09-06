@@ -246,9 +246,11 @@
         user.phone = page.dialogs.element.phoneCreate.val();
         user.address = page.dialogs.element.addressCreate.val();
 
+        user.name = null;
         role.id = page.dialogs.element.roleCreate.val();
         user.role = role;
 
+        console.log(user);
         $.ajax({
             "headers": {
                 "accept": "application/json",
@@ -375,11 +377,11 @@
                 max: 2
             },
             emailCreate: {
-                required: false,
+                required: true,
                 email: true
             },
             phoneCreate: {
-                required: false,
+                required: true,
                 phoneRegex: true
             }
         },
@@ -400,10 +402,12 @@
                 max: "Role invalid"
             },
             emailCreate: {
+                required: "Email is required",
                 email: "Wrong email format. Please follow this pattern: example@ex.com"
             },
             phoneCreate: {
-                phoneRegex: "Wrong phone format. Please follow this pattern: +91 (123) 456-7890"
+                required: "Phone is required",
+                phoneRegex: "Wrong phone format. Please follow this pattern: 0123456789"
             }
         },
         errorLabelContainer: "#mdCreateUser .modal-body .modal-alert-danger",
@@ -442,7 +446,7 @@
                 max: 2
             },
             emailEdit: {
-                required: false,
+                required: true,
                 email: true
             },
             phoneEdit: {
@@ -462,9 +466,11 @@
                 max: "Role invalid"
             },
             emailEdit: {
+                required: "Email is required",
                 email: "Wrong email format. Please follow this pattern: example@ex.com"
             },
             phoneEdit: {
+                required: "Phone is required",
                 phoneRegex: "Wrong phone format. Please follow this pattern: +91 (123) 456-7890"
             }
         },
@@ -550,9 +556,9 @@
     }
 
     $.validator.addMethod("phoneRegex", function (value, element) {
-            return this.optional(element) || /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$/.test(value)
+            return this.optional(element) || /^[0][1-9][0-9]{8,9}$/.test(value)
         },
-        "Please use a valid number following this pattern: +91 (123) 456 7890"
+        "Please use a valid number following this pattern: 0981234567"
     );
 
     function handleFailedTasks(jqXHR, modal) {

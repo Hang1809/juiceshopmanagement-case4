@@ -31,6 +31,9 @@ public interface IUserService extends IGeneralService<User>, UserDetailsService 
 
     boolean ifEmailExistsExceptSelf(String email, Long id);
 
+    boolean existsByUsernameAndIdIsNot(String username, Long id);
+
+
     boolean ifPhoneExists(String phone);
 
     boolean ifPhoneExistsExceptSelf(String phone, Long id);

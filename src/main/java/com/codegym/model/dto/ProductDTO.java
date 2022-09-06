@@ -52,12 +52,13 @@ public class ProductDTO {
     }
 
     public Product toProduct() {
-        return new Product()
+        return (Product) new Product()
                 .setId(id)
                 .setName(name)
                 .setPrice(price)
                 .setQuantity(quantity)
                 .setLocked(isLocked)
-                .setCategory(category);
+                .setCategory(category)
+                .setCreatedBy(createdBy.toUser());
     }
 }

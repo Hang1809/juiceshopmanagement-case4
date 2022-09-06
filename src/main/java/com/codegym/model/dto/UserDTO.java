@@ -22,8 +22,8 @@ import javax.validation.constraints.Size;
 public class UserDTO {
     private Long id;
 
-    @NotBlank(message = "Name is required")
-    @Size(min = 5, max = 20, message = "Name's length must be between 5 and 20 characters")
+//    @NotBlank(message = "Name is required")
+//    @Size(min = 5, max = 20, message = "Name's length must be between 5 and 20 characters")
     private String name;
 
     @NotBlank(message = "Username is required")
